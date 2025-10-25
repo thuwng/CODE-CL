@@ -44,6 +44,14 @@ class CustomLinear(nn.Linear):
         self.gain = None
         self.weight_normalization = weight_normalization
 
+    def update_previous_weights(self):
+        self.previous_weights = self.get_weight().detach().clone()
+
+    def restore_previous_weights(self):
+        if isinstance(self.previous_weights, torch.Tensor):
+            with torch.no_grad():
+                self.weight.copy_(self.previous_weights)
+
     def measure_tasks_similarity(self, task_id, conceptor):
         ratio = measure_conceptor_capacity(and_operation(self.basis_in, conceptor))
         ratio = ratio / measure_conceptor_capacity(self.basis_in)
@@ -129,6 +137,14 @@ class CustomConv2d(nn.Conv2d):
         self.gain = None
         self.eps = 1e-4
         self.weight_normalization = weight_normalization
+
+    def update_previous_weights(self):
+        self.previous_weights = self.get_weight().detach().clone()
+
+    def restore_previous_weights(self):
+        if isinstance(self.previous_weights, torch.Tensor):
+            with torch.no_grad():
+                self.weight.copy_(self.previous_weights)
 
     def measure_tasks_similarity(self, task_id, conceptor):
         ratio = measure_conceptor_capacity(and_operation(self.basis_in, conceptor))
